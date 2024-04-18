@@ -12,9 +12,9 @@ public class Main {
         // - и есть итератор по верх этих итераторов, который переклюсается между ними..
         // как-то так ( (￢_￢) )
 
-        String[] strings_1 = {"text 11", "text 12", "text 13", "text 14", "text 15"};
-        String[] strings_2 = {"text 21", "text 22", "text 23", "text 24", "text 25"};
-        String[] strings_3 = {"text 31", "text 32", "text 33", "text 34", "text 35"};
+        String[] strings_1 = {"text 11", "text 12", "text 13", "text 14", "text 15", "--- 1 ---"};
+        String[] strings_2 = {"text 21", "text 22", "text 23", "text 24", "text 25", "--- 2 ---"};
+        String[] strings_3 = {"text 31", "text 32", "text 33", "text 34", "text 35", "--- 3 ---"};
 
         MyIterator<String> itr_1 = new MyIterator<String>(strings_1);
         MyIterator<String> itr_2 = new MyIterator<String>(strings_2);
@@ -23,10 +23,10 @@ public class Main {
 
 
         Object[] o = {itr_1, itr_2, itr_3};
-        MyFlatIterator<Object> itrO = new MyFlatIterator<Object>(o);
+        MyFlatIterator<Object, String> itr_0 = new MyFlatIterator<Object, String>(o);
 
-        for (int i = 0; i<15; i++){
-            System.out.println(itrO.next());
+        for (int i = 0; i<45; i++){
+            System.out.println(itr_0.next());
         }
 
 
@@ -67,10 +67,12 @@ class MyIterator <T> implements Iterator {
 }
 
 // итератор с итераторами
-class MyFlatIterator <T> implements Iterator {
+class MyFlatIterator<T, T2> implements Iterator {
+
 
     private T[] array;
-    private int index = 0;
+    private int index_1 = 0;
+    private MyIterator<T2> itr;
 
     public MyFlatIterator(T[] array){
         this.array = array;
@@ -78,23 +80,30 @@ class MyFlatIterator <T> implements Iterator {
 
     @Override
     public boolean hasNext() {
-        if (index < array.length){
+        itr = (MyIterator<T2>) array[index_1];
+        if (itr.hasNext()){
+            return true;
+        }
+        index_1++;
+        if (index_1 < array.length){
+            itr = (MyIterator<T2>) array[index_1];
             return true;
         }
         return false;
     }
 
     @Override
-    public T next() {
+    public T2 next() {
         if (hasNext()){
-            return array[index++];
+            return itr.next();
         }
-        index = 0;
-        return array[index++];
+        index_1 = 0;
+        itr = (MyIterator<T2>) array[index_1];
+        return itr.next();
     }
 
     @Override
     public void remove() {
-        array[index] = null;
+        array[index_1] = null;
     }
 }
